@@ -3,11 +3,11 @@
 import logging
 import logging.config
 import os
+import traceback
 
+import adsk.cam
 import adsk.core
 import adsk.fusion
-import adsk.cam
-import traceback
 
 CURRENT_PATH = os.path.dirname(os.path.realpath(__file__))
 
@@ -23,7 +23,6 @@ def run(context):
         # Setup logger
 
         # sol 1: add manually
-        # logger.hasHandlers won't work since it also checks parent loggers
         if len(logger.handlers) == 0:
             # formatter
             formatter = logging.Formatter('%(asctime)s %(name)s$ [%(levelname)s]: %(message)s')
@@ -36,40 +35,12 @@ def run(context):
             logger.setLevel(logging.DEBUG)
             logger.addHandler(file_handler)
 
-        # # sol 2: by dictConfig
-        # conf_path = os.path.join(CURRENT_PATH, 'config.yaml')
-        # with open(conf_path, 'r', encoding='utf-8') as fp:
-        #     config = yaml.load(fp)
-        #     logging.config.dictConfig(config)
-        #     logger = logging.getLogger('mylogger')
-
-        # # sol 3: by fileConfig (will replace root)
-        # # store original root logger
-        # loggers = 'loggers:\n'+ '\n'.join(logging.root.manager.loggerDict)
-        # root_logger = logging.getLogger('root')
-        # ui.messageBox(loggers)
-        # ui.messageBox(str(root_logger.handlers))
-        # conf_path = os.path.join(CURRENT_PATH, 'logging.conf')
-        # log_path = os.path.join(CURRENT_PATH, 'mylogger.log')
-        # logging.config.fileConfig(conf_path, defaults={'fname': log_path}, disable_existing_loggers=False)
-        # # logging.basicConfig(filename=os.path.join(os.path.dirname(os.path.realpath(__file__)), 'mylogger.log'), level=logging.DEBUG)
-        # logger = logging.getLogger('mylogger')
-
-        # # fh = logging.FileHandler(filename=os.path.join(os.path.dirname(os.path.realpath(__file__)), 'mylogger.log'))
-        # # fh.setLevel(logging.DEBUG)
-        # # logger.addHandler(fh)
-
-        # ui.messageBox('mylogger handlers:\n' + str(logger.handlers))
-        # logger.debug(loggers)
         logger.info('Initializing add-in ...')
 
         # try import packages
         try:
             logger.info('Try to import package')
             import numpy as np
-
-            # logger.info("Installed Successfully.")
-
         except:
             logger.info("Try to install packages.")
             # install packages

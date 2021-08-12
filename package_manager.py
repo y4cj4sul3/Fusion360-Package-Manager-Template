@@ -1,7 +1,5 @@
 import logging
 import os
-# import sys
-# import site
 import platform
 import subprocess
 
@@ -49,27 +47,14 @@ def install_package(requirements_file):
     logger.info('Upgrade pip')
     logger.info(f'Original pip version: { pip.__version__}')
     # upgrade pip
-    execute_external_command(['python -m pip install --upgrade pip', 'python -m pip install pip==random'], env=env)
-    # execute_external_command(['python -m pip list'], env=env)
+    execute_external_command(['python -m pip install --upgrade pip'], env=env)
     # reimport to update package
     import importlib
     importlib.reload(pip)
     logger.info(f'Upgraded pip version: { pip.__version__}')
 
     # Install required dependency
-
-    # Method 1: pip.main
-    # This is a internal function of pip and it doesn't seems to report installation result
-    # if hasattr(pip, 'main'):
-    #     pip.main(['install', '-r', requirements_file])
-    # elif hasattr(pip, '_internal') and hasattr(pip._internal, 'main'):
-    #     pip._internal.main(['install', '-r', requirements_file])
-
-    # Method 2: pip install -r
-    # This may failed to install some of the packages
-    # execute_external_command([f'python -m pip install -r "{requirements_file}"'], env=env)
-
-    # Method 3: pip install line by line
+    # pip install line by line
     with open(requirements_file, 'r') as fp:
         for line in fp.readlines():
             execute_external_command([f'python -m pip install --user {line}'], env=env)
@@ -84,22 +69,16 @@ def execute_external_command(commands, env=None, block=False):
     if type(commands) == str:
         commands = [commands]
 
+    # set environment variable
+    if env is None:
+        env = os.environ.copy()
+
     for command in commands:
-        # set environment variable
-        if env is None:
-            env = os.environ.copy()
-
-        # execute external command
-        # try:
-        #     process = subprocess.run(command.split(' '), env=env, shell=True, stdout=subprocess.PIPE, check=True)
-        # except subprocess.CalledProcessError:
-        #     logger.debug(process.stdout.decode().strip())
-        #     if process.stderr is not None:
-        #         logger.debug(process.stderr.decode().strip())
-
         logger.debug('$ ' + command)
 
+        # execute command
         process = subprocess.Popen(command, env=env, shell=True, stdout=subprocess.PIPE)
+        # log result
         if block:
             # this will wait until command finished
             stdout, stderr = process.communicate()
@@ -116,20 +95,7 @@ def execute_external_command(commands, env=None, block=False):
 
 
 def get_env():
-    # python path
-    # for adding to environment variable
-    # python_path = ''
-    # solution 1: sys.executable (unreliable, somwtimes it is relative path or refers to the Fusion 360 app)
-    # exe_path = os.path.realpath(sys.executable)
-    # if os.path.basename(exe_path).lower().startswith('python') and os.path.exists(exe_path):
-    #     python_path = os.path.dirname(exe_path)
-    # else:
-    #     # solution 2: site.getsitepackage (unreliable, sometimes it is empty)
-    #     site_paths = site.getsitepackages()
-    #     if len(site_paths) > 0:
-    #         python_path = site_paths[0].rsplit('lib')[0]
-
-    # solution 3: by package path (most realiable)
+    # get python executable path by package path (most realiable)
     python_path = os.path.realpath(os.__file__).rsplit('lib')[0]
 
     # detect OS type
@@ -178,9 +144,11 @@ if __name__ == '__main__':
         PATH_SEPARATOR = ':'
     env['PATH'] = python_path + PATH_SEPARATOR + env['PATH']
 
-    # e.g. install numpy
+    # e.g. install numpy and output installed packages
+    requirements_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'requirements.txt')
     commands = [
-        'python -m pip uninstall numpy',
-        'python -m pip list'
+        'python -m pip install numpy',
+        'python -m pip list',
+        f'python -m pip freeze > {requirements_file}'
     ]
     execute_external_command(commands, env=env)

@@ -4,7 +4,7 @@
 	"id":	"899a4d4b-d906-4afd-b7b7-e7a2b2c04bdb",
 	"author":	"y4cj4sul3",
 	"description":	{
-		"":	"This is a emaple of how to install third-party python packages to Fusion 360 python executable."
+		"":	"This is an example of how to install third-party python packages to Fusion 360 python executable."
 	},
 	"version":	"1.0.0",
 	"runOnStartup":	false,
