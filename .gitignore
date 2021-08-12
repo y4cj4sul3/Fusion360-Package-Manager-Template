@@ -1,0 +1,14 @@
+# VS Code
+.vscode
+
+# MacOS
+*.DS_Store
+
+# Cache files
+*__pycache__
+
+# Fusion 360
+.env
+
+# Large/temp files
+*.log
