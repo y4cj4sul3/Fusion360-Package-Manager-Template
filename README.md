@@ -1,4 +1,4 @@
-# Fusion 360 Package Manager Temaplate
+# Fusion 360 Package Manager Template
 
 This is a Fusion 360 add-in template that allows the use of third-party python packages.
 
